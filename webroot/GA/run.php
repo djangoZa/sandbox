@@ -1,7 +1,20 @@
 <?php
+$gaService = new GAService(
+	array(
+		new GeneOption($name = 'symbols', $limit = 0, $value = array('usd','zar','gbp')),
+		new GeneOption($name = 'barsPerSymbol', $limit = 1, array(2,3,5,8,13,21), 'symbols'),
+		new GeneOption($name = 'hiddenLayers', $limit = 1, array(1,2,3,5)),
+		new GeneOption($name = 'nodesPerHiddenLayer', $limit = 1, array(1,2,3,5,8,13,21), 'hiddenLayers')
+	)
+);
+
+$gaService->run();
+
+
 class Chromosome
 {
     private $_genes = array();
+    private $_fitness = 0;
 
     public function __construct(Array $genes)
     {
@@ -13,29 +26,53 @@ class Chromosome
     		}
     	}
     }
+
+    public function setFitness($value)
+    {
+    	$this->_fitness = $value;
+    }
+
+    public function getFitness()
+    {
+    	return $this->_fitness;
+    }
 }
 
 class Gene
 {
 	private $_name;
-    private $_value;
+    private $_values;
 
-    public function __construct(Array $options)
+    public function __construct($name, $values)
     {
-    	$this->_name = $options['name'];
-    	$this->_value = $options['value'];
+    	$this->_name = $name;
+    	$this->_values = $values;
+    }
+
+    public function getName()
+    {
+    	return $this->_name;
+    }
+
+    public function getValues()
+    {
+    	return $this->_values;
     }
 }
 
-class GeneOptions
+class GeneOption
 {
 	private $_name;
+	private $_limit;
 	private $_options = array();
+	private $_parentGeneName = array();
 
-	public function __construct($name, Array $options)
+	public function __construct($name, $limit, Array $options, $parentGeneName = '')
 	{
 		$this->_name = $name;
+		$this->_limit = $limit;
 		$this->_options = $options;
+		$this->_parentGeneName = $parentGeneName;
 	}
 
 	public function getName()
@@ -47,12 +84,21 @@ class GeneOptions
 	{
 		return $this->_options;
 	}
+
+	public function getParentGeneName()
+	{
+		return $this->_parentGeneName;
+	}
+
+	public function getLimit()
+	{
+		return $this->_limit;
+	}
 }
 
 class GAService
 {
-	private $_minimumSymbols = 2;
-	private $_maxPopulationSize = 1;
+	private $_maxPopulationSize = 100;
 	private $_geneOptions;
 
 	public function __construct(Array $geneOptions)
@@ -62,128 +108,155 @@ class GAService
 
 	public function run()
 	{
+		$continue = true;
+		$generation = 0;
+
+		//Get the initial chromosome population
 		$chromosomes = $this->_getInitialChromosomePopulation();
-		
-		var_dump($chromosomes);
+
+		while ($continue === true) 
+		{
+			$generation += 1;
+			echo "Generation: $generation \n";
+
+			//Calculate the fitness functions per chromsomes
+			$chromosomes = $this->_calculateFitnessFunctionPerChromosome($chromosomes);
+
+			if ($this->_isRunSufficient($chromosomes)) {
+				//Stop Replication
+				$continue = false;
+			} else {
+				//Replicate the chromosomes
+				$chromosomes = $this->_getChromosomesForBreeding($chromosomes);
+				$chromosomes = $this->_crossOverChromosomes($chromosomes);
+				$chromosomes = $this->_mutateChromosomes($chromosomes);
+			}	
+		}
+	}
+
+	private function _isRunSufficient()
+	{
+		return false;
+	}
+
+	private function _mutateChromosomes(Array $chromosomes)
+	{
+		return $chromosomes;
+	}
+
+	private function _crossOverChromosomes(Array $chromosomes)
+	{
+		return $chromosomes;
+	}
+
+	private function _getChromosomesForBreeding(Array $chromosomes)
+	{
+		return $chromosomes;
+	}
+
+	private function _calculateFitnessFunctionPerChromosome(Array $chromosomes)
+	{
+		$out = array();
+
+		foreach ($chromosomes as $chromosome) {
+			$chromosome = $this->_setFitness($chromosome);
+			$out[] = $chromosome;
+		}
+
+		return $out;
+	}	
+
+	private function _getRandomGeneOptionValues(GeneOption $geneOption, $limit)
+	{
+		$out = null;
+
+		$geneOptions = $geneOption->getOptions();
+		$limit = (empty($limit)) ? count($geneOptions) : $limit;
+		$randomKeys = array_rand($geneOptions, rand(1, $limit));
+
+		if (is_array($randomKeys)) {
+			$out = array();
+			foreach ($randomKeys as $key) {
+				$out[] = $geneOptions[$key];
+			}
+		} else {
+			$out = $geneOptions[$randomKeys];
+		}
+
+		return $out;
+	}
+
+	private function _setFitness(Chromosome $chromosome)
+	{
+		$fitness = rand(1, 100) / 100;
+		$chromosome->setFitness($fitness);
+		return $chromosome;
+	}
+
+	private function _getGene(Array $genes, $geneName)
+	{
+	    $out = array();
+
+		foreach($genes as $gene) {
+			if ($gene->getName() == $geneName) {
+				$out = $gene;
+				break;
+			}
+		}
+
+		return $out;
 	}
 
 	private function _getInitialChromosomePopulation()
 	{
 		$chromosomes = array();
 
-		for ($i = 0; $i < $this->_maxPopulationSize; $i++)
-		{
+		//GENERATE INITIAL POPULATION OF CHROMOMES
+		for ($c = 0; $c < $this->_maxPopulationSize; $c++) {
+
+			//CREATE THE GENES FOR THE CHROMOSOME
 			$genes = array();
-			$symbols = array();
-			$barsPerSymbol = array();
-			$hiddenLayers = 1;
-			$nodesPerHiddenLayers = 1;
 
-			foreach($this->_geneOptions as $geneOption)
-			{
-				$name = $geneOption->getName();
-				$options = $geneOption->getOptions();
+			foreach ($this->_geneOptions as $geneOption) {
 
-				switch ($name)
-				{
-					case "symbol":
+				//GET THE GENE OPTION ATTRIBUTES
+				$parentGeneName = $geneOption->getParentGeneName();
 
-						$randomEntries = rand($this->_minimumSymbols, count($options));
-						$randomKeys = array_rand($options, $randomEntries);
+				//CREATE THE GENE
+				if (!empty($parentGeneName)) {
 
-						//POPULATE THE SYMBOLS
-						if (is_array($randomKeys))
-						{
-							foreach($randomKeys as $key)
-							{
-								$symbols[] = $options[$key];
-							}
-						} else {
-							$symbols[] = $options[$randomKeys];
+					$parentGene = $this->_getGene($genes, $parentGeneName);
+					$parentGeneValues = $parentGene->getValues();
+					$geneOptionValues = array();
+
+					if (is_array($parentGeneValues))
+					{
+						foreach($parentGeneValues as $value) {
+							$geneOptionValues[] = $this->_getRandomGeneOptionValues($geneOption, $geneOption->getLimit());
 						}
-						
-						//CREATE THE GENE
-						$genes[] = new Gene(array(
-							'name' => $name,
-							'value' => $symbols
-						));
-
-						break;
-
-					case "barsPerSymbol":
-
-						$barsPerSymbol = array();
-
-						//POPULATE THE BARS PER SYMBOL
-						foreach($symbols as $symbol)
-						{
-							$randomKey = array_rand($options);
-							$barsPerSymbol[$symbol] = $options[$randomKey];
+					} else if (is_int($parentGeneValues)) {
+						for ($pi = 0; $pi < $parentGeneValues; $pi++) {
+							$geneOptionValues[] = $this->_getRandomGeneOptionValues($geneOption, $geneOption->getLimit());
 						}
+					} else {
+						$geneOptionValues[] = $this->_getRandomGeneOptionValues($geneOption, $geneOption->getLimit());
+					}
+					
 
-						//CREATE THE GENE
-						$genes[] = new Gene(array(
-							'name' => $name,
-							'value' => $barsPerSymbol
-						));
+					$genes[] = new Gene($geneOption->getName(), $geneOptionValues);
 
-					    break;
+				} else {
 
-					case "hiddenLayers":
+					$genes[] = new Gene($geneOption->getName(), $this->_getRandomGeneOptionValues($geneOption, $geneOption->getLimit()));
 
-						//POPULATE THE HIDDEN LAYERS
-						$randomKey = array_rand($options);
-						$hiddenLayers = $options[$randomKey];
-
-						//CREATE THE GENE
-						$genes[] = new Gene(array(
-							'name' => $name,
-							'value' => $hiddenLayers
-						));
-
-						break;
-
-					case "nodesPerHiddenLayer":
-
-						$nodesPerHiddenLayer = array();
-
-						//POPULATE THE NODES PER HIDDEN LAYER
-						for($l = 0; $l < $hiddenLayers; $l++)
-						{
-							$randomKey = array_rand($options);
-							$nodes = $options[$randomKey];
-							$nodesPerHiddenLayer[$l] = $nodes;
-						}
-
-						//CREATE THE GENE
-						$genes[] = new Gene(array(
-							'name' => $name,
-							'value' => $nodesPerHiddenLayer
-						));
-
-					    break;
 				}
+
 			}
 
 			//CREATE THE CHROMOSOME
-		    $chromosomes[] = new Chromosome($genes);
-
-			//UNSET
-			unset($genes);
-			unset($symbols);
-			unset($barsPerSymbol);
-			unset($hiddenLayers);
-			unset($nodesPerHiddenLayers);
+	    	$chromosomes[] = new Chromosome($genes);
 		}
 
 		return $chromosomes;
 	}
 }
-
-$gaService = new GAService(array(
-	new GeneOptions('symbol', array('usd','zar','gbp')),
-	new GeneOptions('barsPerSymbol', array(2,3,5,8,13,21)),
-	new GeneOptions('hiddenLayers', array(1,2,3,5)),
-	new GeneOptions('nodesPerHiddenLayer', array(1,2,3,5,8,13,21))
-));
-$gaService->run();
