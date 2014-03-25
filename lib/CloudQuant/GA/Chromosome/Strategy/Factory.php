@@ -1,5 +1,5 @@
 <?php
-class CloudQuant_GA_Chromosome_Repository_Factory
+class CloudQuant_GA_Chromosome_Strategy_Factory
 {
 	public static function make($type)
 	{
@@ -8,7 +8,7 @@ class CloudQuant_GA_Chromosome_Repository_Factory
 		switch ($type) {
 			case 'NeuralNetwork':
 				$geneFactory = new CloudQuant_GA_Gene_Factory();
-				$out = new CloudQuant_GA_Chromosome_Repository_NeuralNetwork($geneFactory);
+				$out = new CloudQuant_GA_Chromosome_Strategy_NeuralNetwork($geneFactory);
 			    break;
 		}
 
