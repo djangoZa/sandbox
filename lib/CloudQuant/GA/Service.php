@@ -14,9 +14,7 @@ class CloudQuant_GA_Service
 		$chromosomes = $this->_getInitialChromosomePopulation();
 		$chromosomes = $this->_setFitnessToChromosomePopulation($chromosomes);
 
-		while ($this->_notAboveDesiredAverageFitness($chromosomes)) {
-
-var_dump($chromosomes);
+		while ($this->_isAboveDesiredAverageFitness($chromosomes) == false) {
 
 			$generation += 1;
 			echo "Generation: $generation\n";
@@ -29,38 +27,31 @@ var_dump($chromosomes);
 	}
 
 	private function _getInitialChromosomePopulation() {
-		$out = array();
-		for ($i = 0; $i < $this->_chromosomeStrategy->getMaxPopulationCount(); $i++) {
-			$out[] = $this->_chromosomeStrategy->makeRandomChromosome();
-		}
-		return $out;
-	}
-
-	private function _breedChromosomePopulation(Array $chromosomes) {
-		return array();
+		$chromosomes = $this->_chromosomeStrategy->getInitialChromosomePopulation();
+		return $chromosomes;
 	}
 
 	private function _setFitnessToChromosomePopulation(Array $chromosomes) {
-		foreach ($chromosomes as $chromosome) {
-			$chromosome = $this->_chromosomeStrategy->setFitness($chromosome);
-		}
-		sleep(1);
+		$chromosomes = $this->_chromosomeStrategy->setFitnessToChromosomePopulation($chromosomes);
 		return $chromosomes;
 	}
 
 	private function _getTheFittestChromosomes(Array $chromosomes) {
+		$chromosomes = $this->_chromosomeStrategy->getFittestChromosomes($chromosomes);
 		return $chromosomes;
 	}
 
 	private function _crossOverChromosomes(Array $chromosomes) {
+		$chromosomes = $this->_chromosomeStrategy->crossOverChromosomes($chromosomes);
 		return $chromosomes;
 	}
 
 	private function _mutateRandomChromosomes(Array $chromosomes) {
+		$chromosomes = $this->_chromosomeStrategy->mutateRandomChromosomes($chromosomes);
 		return $chromosomes;
 	}
 
-	private function _notAboveDesiredAverageFitness(Array $chromosomes) {
-		return true;
+	private function _isAboveDesiredAverageFitness(Array $chromosomes) {
+		return false;
 	}
 }
