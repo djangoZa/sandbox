@@ -8,5 +8,10 @@ abstract class CloudQuant_GA_Chromosome_Strategy_Abstract
         $this->_geneFactory = $geneFactory;
     }
 
+    public function getChromosomeByGenes(Array $genes)
+    {
+        return new CloudQuant_GA_Chromosome($genes);
+    }
+
     abstract public function getRandomChromosome();
 }
