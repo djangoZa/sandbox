@@ -6,14 +6,20 @@ class CloudQuant_GA_Gene_Factory
 		$out = null;
 
 		switch ($type) {
-			case 'input':
-				$out = new CloudQuant_GA_Gene_Input(range(rand(0,50), 100, rand(5,10)));
+			case 'neuralNetworkInputLayer':
+				$out = new CloudQuant_GA_Gene_NeuralNetworkInputLayer(
+					range(rand(0,50), 100, rand(5,10))
+				);
 				break;
-		    case 'hidden':
-		    	$out = new CloudQuant_GA_Gene_Hidden(range(rand(0,50), 100, rand(5,10)));
+		    case 'neuralNetworkHiddenLayer':
+		    	$out = new CloudQuant_GA_Gene_NeuralNetworkHiddenLayer(
+		    		range(rand(0,50), 100, rand(5,10))
+		    	);
 				break;
-			case 'output':
-				$out = new CloudQuant_GA_Gene_Output(range(rand(0,50), 100, rand(5,10)));
+			case 'neuralNetworkOutputLayer':
+				$out = new CloudQuant_GA_Gene_NeuralNetworkOutputLayer(
+					range(rand(0,50), 100, rand(5,10))
+				);
 				break;
 		}
 

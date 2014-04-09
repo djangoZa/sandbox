@@ -1,10 +1,10 @@
 <?php
 class CloudQuant_GA_Service
 {
-	private $_chromosomeStrategy;
+	private $_gaServiceStrategy;
 
-	public function __construct(CloudQuant_GA_Chromosome_Strategy_Abstract $chromosomeStrategy) {
-		$this->_chromosomeStrategy = $chromosomeStrategy;
+	public function __construct(CloudQuant_GA_Service_Strategy_Abstract $gaServiceStrategy) {
+		$this->_gaServiceStrategy = $gaServiceStrategy;
 	}
 
 	public function run() {
@@ -27,27 +27,27 @@ class CloudQuant_GA_Service
 	}
 
 	private function _getInitialChromosomePopulation() {
-		$chromosomes = $this->_chromosomeStrategy->getInitialChromosomePopulation();
+		$chromosomes = $this->_gaServiceStrategy->getInitialChromosomePopulation();
 		return $chromosomes;
 	}
 
 	private function _setFitnessToChromosomePopulation(Array $chromosomes) {
-		$chromosomes = $this->_chromosomeStrategy->setFitnessToChromosomePopulation($chromosomes);
+		$chromosomes = $this->_gaServiceStrategy->setFitnessToChromosomePopulation($chromosomes);
 		return $chromosomes;
 	}
 
 	private function _getTheFittestChromosomes(Array $chromosomes) {
-		$chromosomes = $this->_chromosomeStrategy->getFittestChromosomes($chromosomes);
+		$chromosomes = $this->_gaServiceStrategy->getFittestChromosomes($chromosomes);
 		return $chromosomes;
 	}
 
 	private function _crossOverChromosomes(Array $chromosomes) {
-		$chromosomes = $this->_chromosomeStrategy->crossOverChromosomes($chromosomes);
+		$chromosomes = $this->_gaServiceStrategy->crossOverChromosomes($chromosomes);
 		return $chromosomes;
 	}
 
 	private function _mutateRandomChromosomes(Array $chromosomes) {
-		$chromosomes = $this->_chromosomeStrategy->mutateRandomChromosomes($chromosomes);
+		$chromosomes = $this->_gaServiceStrategy->mutateRandomChromosomes($chromosomes);
 		return $chromosomes;
 	}
 

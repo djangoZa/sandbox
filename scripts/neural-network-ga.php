@@ -1,6 +1,8 @@
 <?php
 require_once(dirname(__FILE__) . '/../lib/bootstrap.php');
 
-$chromosomeStrategy = CloudQuant_GA_Chromosome_Strategy_Factory::make('NeuralNetwork');
-$gaService = new CloudQuant_GA_Service($chromosomeStrategy);
+$gaGeneFactory = new CloudQuant_GA_Gene_Factory();
+$gaChromosomeStrategy = new CloudQuant_Ga_Chromosome_Strategy_NeuralNetwork($gaGeneFactory);
+$gaServiceStrategy = new CloudQuant_GA_Service_Strategy_Basic($gaChromosomeStrategy);
+$gaService = new CloudQuant_GA_Service($gaServiceStrategy);
 $gaService->run();
