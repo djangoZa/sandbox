@@ -5,6 +5,7 @@ class CloudQuant_GA_Service_Strategy_Basic extends CloudQuant_GA_Service_Strateg
 	private $_mutationRate = 0.3;
 	private $_maxPopulationCount = 10;
 	private $_fittestPopulationMultiplier = 0.3;
+	private $_desiredAverageFitness = 0.75;
 	private $_fittestPopulationSize;
 
 	public function __construct(CloudQuant_GA_Chromosome_Strategy_Abstract $chromosomeStrategy)
@@ -53,11 +54,27 @@ class CloudQuant_GA_Service_Strategy_Basic extends CloudQuant_GA_Service_Strateg
 	{
 		foreach ($chromosomes as $chromosome) {
 			if ((mt_rand() / mt_getrandmax()) < $this->_mutationRate) {
-				die('MUTATE');
+				//die('MUTATE');
 				$chromosome->mutate();
 			}
 		}
 		return $chromosomes;
+	}
+
+	public function isAboveDesiredAverageFitness(Array $chromosomes)
+	{
+		$totalFitness = 0;
+		$totalChromosomes = count($chromosomes);
+
+		foreach ($chromosomes as $chromosome) {
+			$totalFitness += $chromosome->getFitness();
+		}
+
+		$averageFitness = $totalFitness / $totalChromosomes;
+
+		$out = ($averageFitness > $this->_desiredAverageFitness) ? true : false ;
+
+		return $out;
 	}
 
 	private function _setFitness(CloudQuant_GA_Chromosome $chromosome)

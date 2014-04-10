@@ -7,4 +7,5 @@ abstract class CloudQuant_GA_Service_Strategy_Abstract
 	abstract public function getFittestChromosomes(Array $chromosomes);
 	abstract public function crossOverChromosomes(Array $chromosomes);
 	abstract public function mutateRandomChromosomes(Array $chromosomes);
+    abstract public function isAboveDesiredAverageFitness(Array $chromosomes);
 }

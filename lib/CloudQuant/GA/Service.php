@@ -61,6 +61,7 @@ class CloudQuant_GA_Service
 
 	private function _isAboveDesiredAverageFitness(Array $chromosomes)
 	{
-		return false;
+		$out = $this->_gaServiceStrategy->isAboveDesiredAverageFitness($chromosomes);
+		return $out;
 	}
 }
