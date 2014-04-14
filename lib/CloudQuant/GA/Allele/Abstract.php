@@ -1,5 +1,5 @@
 <?php
-abstract class Allele
+abstract class CloudQuant_GA_Allele_Abstract
 {
     private $_name;
 

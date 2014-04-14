@@ -8,5 +8,8 @@ abstract class CloudQuant_GA_Gene_Abstract
         $this->_alleles = $alleles;
     }
 
-    abstract public function mutate();
+    public function getAlleles()
+    {
+        return $this->_alleles;
+    }
 }

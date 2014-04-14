@@ -2,7 +2,7 @@
 class CloudQuant_GA_Service_Strategy_Basic extends CloudQuant_GA_Service_Strategy_Abstract
 {
 	private $_chromosomeStrategy;
-	private $_mutationRate = 0.3;
+	private $_mutationRate = 0.01;
 	private $_maxPopulationCount = 10;
 	private $_fittestPopulationMultiplier = 0.3;
 	private $_desiredAverageFitness = 0.75;
@@ -53,10 +53,16 @@ class CloudQuant_GA_Service_Strategy_Basic extends CloudQuant_GA_Service_Strateg
 	public function mutateRandomChromosomes(Array $chromosomes)
 	{
 		foreach ($chromosomes as $chromosome) {
-			if ((mt_rand() / mt_getrandmax()) < $this->_mutationRate) {
-				//die('MUTATE');
-				$chromosome->mutate();
+			$genes = $chromosome->getGenes();
+			foreach ($genes as $gene) {
+				$alleles = $gene->getAlleles();
+				foreach ($alleles as $allele) {
+					if ((mt_rand() / mt_getrandmax()) < $this->_mutationRate) {
+						$allele->mutate();
+					}
+				}
 			}
+			
 		}
 		return $chromosomes;
 	}

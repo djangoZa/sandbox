@@ -11,12 +11,6 @@ class CloudQuant_GA_Chromosome
 		$this->_geneCount = count($this->_genes);
 	}
 
-	public function mutate()
-	{
-		$index = floor((mt_rand() / mt_getrandmax()) * $this->_geneCount);
-		$this->_genes[$index]->mutate();
-	}
-
 	public function setFitness($fitness)
 	{
 		$this->_fitness = $fitness;
