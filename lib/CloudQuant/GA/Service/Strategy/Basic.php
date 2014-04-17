@@ -58,7 +58,7 @@ class CloudQuant_GA_Service_Strategy_Basic extends CloudQuant_GA_Service_Strateg
 				$alleles = $gene->getAlleles();
 				foreach ($alleles as $allele) {
 					if ((mt_rand() / mt_getrandmax()) < $this->_mutationRate) {
-						$allele->mutate();
+						$this->_chromosomeStrategy->mutateAllele($allele);
 					}
 				}
 			}
